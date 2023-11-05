@@ -33,7 +33,7 @@ public class SecurityConfiguration {
                         .permitAll()
                         .requestMatchers("api/v1/admin").hasAuthority(Role.ADMIN.name())
                         .requestMatchers("api/v1/admin").hasAuthority(Role.USER.name())
-                        .anyRequest().authenticated())
+                        .anyRequest().permitAll())
 
                         .sessionManagement(manager-> manager.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authenticationProvider(authenticationProvider()).addFilterBefore(

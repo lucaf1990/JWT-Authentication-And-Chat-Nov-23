@@ -1,5 +1,6 @@
 package com.luca.giornale.entities;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.luca.giornale.enums.Role;
 import jakarta.persistence.*;
 import lombok.Data;
@@ -13,15 +14,23 @@ import java.util.*;
 @Entity
 @Table(name="userTable")
 public class User implements UserDetails {
-        @Id
-        @GeneratedValue(strategy = GenerationType.IDENTITY)
-        private Integer id;
-        private String firstName;
-        private String lastName;
-        private String email;
-        private String password;
-        private Role role;
+	@Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    private String name;
+    private String photoUrl;
+    @Column(unique = true)
+    private String email;
+    private String password;
+    private Role role;
 
+    @OneToMany(mappedBy = "sender")
+    @JsonManagedReference
+    private List<Chat> sentChats;
+
+    @OneToMany(mappedBy = "receiver")
+    @JsonManagedReference
+    private List<Chat> receivedChats;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

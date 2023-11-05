@@ -11,24 +11,18 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 @SpringBootApplication
 
-public class GiornaleApplication implements CommandLineRunner {
+public  class GiornaleApplication implements CommandLineRunner {
 
     @Autowired
     private UserRepository userRepository;
     public static void main(String[] args) {
         SpringApplication.run(GiornaleApplication.class, args);
-    }
-public void run(String... args){
-    User adminAcc= userRepository.findByRole(Role.ADMIN);
-    if(null==adminAcc){
-        User user= new User();
-        user.setEmail("admin@gmail.com");
-        user.setFirstName("luca");
-        user.setLastName("forma");
-        user.setRole(Role.ADMIN);
-        user.setPassword(new BCryptPasswordEncoder().encode("admin"));
-    userRepository.save(user);
-    }
+    
 }
+	@Override
+	public void run(String... args) throws Exception {
+		// TODO Auto-generated method stub
+		
+	}
 
 }

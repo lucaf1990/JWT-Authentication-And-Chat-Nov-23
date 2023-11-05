@@ -30,8 +30,8 @@ private final  JWTService jwtService;
     public User signUp(SignUpRequest signUpRequest){
         User user = new User();
         user.setEmail(signUpRequest.getEmail());
-user.setLastName(signUpRequest.getLastName());
-user.setFirstName(signUpRequest.getFirstName());
+user.setName(signUpRequest.getName());
+user.setPhotoUrl(signUpRequest.getPhotoUrl());
 user.setRole(Role.USER);
 user.setPassword(passwordEncoder.encode(signUpRequest.getPassword()));
 
@@ -39,20 +39,21 @@ return userRepository.save(user);
 
     }
 
-public JwtAuthenticationResponse signin(SigninRequest signinRequest) {
-	authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(signinRequest.getEmail(), signinRequest.getPassword()));
-	var user= userRepository.findByEmail(signinRequest.getEmail());
-var jwt= jwtService.generateToken(user);
-var refreshToken= jwtService.generateRefreshToken(new HashMap<>(),user);
+    public JwtAuthenticationResponse signin(SigninRequest signinRequest) {
+        authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(signinRequest.getEmail(), signinRequest.getPassword()));
+        
+        User userInfo = (User) userRepository.findByEmail(signinRequest.getEmail());
+        var jwt = jwtService.generateToken(userInfo);
+        var refreshToken = jwtService.generateRefreshToken(new HashMap<>(), userInfo);
 
-JwtAuthenticationResponse jwtAuthenticationResponse= new JwtAuthenticationResponse();
-jwtAuthenticationResponse.setToken(jwt);
-jwtAuthenticationResponse.setRefreshToken(refreshToken);
-return jwtAuthenticationResponse;
-	
-	
-	
-}
+        JwtAuthenticationResponse jwtAuthenticationResponse = new JwtAuthenticationResponse();
+        jwtAuthenticationResponse.setToken(jwt);
+        jwtAuthenticationResponse.setRefreshToken(refreshToken);
+        jwtAuthenticationResponse.setUser(userInfo);
+        jwtAuthenticationResponse.setId(userInfo.getId());
+
+        return jwtAuthenticationResponse;
+    }
 
 public JwtAuthenticationResponse refreshToken(RefreshTokenRequest refreshToken) {
 	String userEmail= jwtService.extractUserName(refreshToken.getToken());
