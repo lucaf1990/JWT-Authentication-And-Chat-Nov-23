@@ -36,36 +36,63 @@ public class ChatMessagesServiceImpl implements ChatMessagesService{
 	    Long chatId = messageDTO.getChatId();
 	    String content = messageDTO.getContent();
 	    Chat chat = chatRepository.findById(chatId).orElse(null);
+
+	    if (chat == null) {
+	        // Handle the case when the chat is not found
+	        return null;
+	    }
+
+	    User currentUser = userRepository.findByEmail(messageDTO.getSender());
+
+	    if (currentUser == null) {
+	        // Handle the case when the user is not found
+	        return null;
+	    }
+
 	    User sender = chat.getSender();
-        User receiver = chat.getReceiver();
+	    User receiver = chat.getReceiver();
+
+	    // Check if the current user is part of the chat
+	    if (!currentUser.getEmail().equals(sender.getEmail()) && !currentUser.getEmail().equals(receiver.getEmail())) {
+	        // Handle the case when the current user is not part of the chat
+	        return null;
+	    }
+
 	    // Create and set the message details
-		ChatMessages message = new ChatMessages();
-		message.setChat(chat);
-		message.setContent(content);
-		message.setSender(sender);
-		message.setReceiver(receiver);
-		message.setTimestamp(LocalDateTime.now());
+	    ChatMessages message = new ChatMessages();
+	    message.setChat(chat);
+	    message.setContent(content);
 
-		// Determine the user's role based on the chat
-		
-		if (sender.getEmail().equals(messageDTO.getSender())) {
-		    message.setUserRole(UserRole.SENDER);
-		} else if (receiver.getEmail().equals(messageDTO.getSender())) {
-		    message.setUserRole(UserRole.RECEIVER);
-		}
+	    // Determine the sender and receiver based on the current user
+	    if (currentUser.getEmail().equals(sender.getEmail())) {
+	        message.setSender(sender);
+	        message.setReceiver(receiver);
+	        message.setUserRole(UserRole.SENDER);
+	    } else if (currentUser.getEmail().equals(receiver.getEmail())) {
+	        message.setSender(receiver);
+	        message.setReceiver(sender);
+	        message.setUserRole(UserRole.RECEIVER);
+	    } else {
+	        // Handle the case when the sender's email doesn't match the chat's sender or receiver
+	        return null;
+	    }
 
-		// Add the message to the chat's list of messages
-		if (chat.getMessages() == null) {
-		    chat.setMessages(new ArrayList<>());
-		}
-		chat.getMessages().add(message);
+	    message.setTimestamp(LocalDateTime.now());
 
-		// Save the chat to update the messages list
-		chatRepository.save(chat);
-		chatMessagesRepository.save(message);
-		return message;
+	    // Add the message to the chat's list of messages
+	    if (chat.getMessages() == null) {
+	        chat.setMessages(new ArrayList<>());
+	    }
+	    chat.getMessages().add(message);
+
+	    // Save the chat to update the messages list
+	    chatRepository.save(chat);
+	    chatMessagesRepository.save(message);
+
+	    return message;
 	}
-	
+
+
 	
 	
     
