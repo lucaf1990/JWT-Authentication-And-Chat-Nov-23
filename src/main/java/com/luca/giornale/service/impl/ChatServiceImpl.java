@@ -42,9 +42,9 @@ public class ChatServiceImpl implements ChatService {
     
     public List<Chat> getChatsForUser(String userEmail) {
         // Use the repository method to retrieve chats for the user
-        return chatRepository.findBySenderEmailOrReceiverEmail(userEmail, userEmail);
+        return chatRepository.findBySenderEmailOrReceiverEmail(userEmail);
     }
-    
+
     public List<ChatMessages> getMessagesByChatId(Long chatId) {
         Optional<Chat> chatOptional = chatRepository.findById(chatId);
         
